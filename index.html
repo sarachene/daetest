@@ -102,6 +102,25 @@
       margin-bottom: 0.65rem;
     }
 
+    .kmb-toolbar-stack {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .kmb-route-label {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-right: 0.35rem;
+    }
+
+    .kmb-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
     .kmb-tabs {
       display: flex;
       gap: 0.35rem;
@@ -240,16 +259,28 @@
     <section class="kmb" id="kmb-panel" aria-labelledby="kmb-heading">
       <h2 id="kmb-heading">九巴 6D 實時到站</h2>
       <p class="kmb-note">
-        資料來源：運輸署「九龍巴士及龍運巴士路線實時到站數據」（data.etabus.gov.hk）。ETA 約每分鐘更新；下列為各路線方向各站之預計到站時間。
+        資料來源：運輸署「九龍巴士及龍運巴士路線實時到站數據」（data.etabus.gov.hk）。ETA 約每分鐘更新；下列為各路線方向各站之預計到站時間。可切換 <strong>6D</strong> 或 <strong>2X</strong>。
       </p>
-      <div class="kmb-toolbar">
-        <div class="kmb-tabs" role="tablist" aria-label="行車方向">
-          <button type="button" role="tab" data-dir="O" class="active" aria-selected="true">
-            往美孚
-          </button>
-          <button type="button" role="tab" data-dir="I" aria-selected="false">
-            往牛頭角
-          </button>
+      <div class="kmb-toolbar kmb-toolbar-stack">
+        <div class="kmb-row">
+          <span class="kmb-route-label" id="kmb-route-label">路線</span>
+          <div class="kmb-tabs" role="tablist" aria-label="路線">
+            <button type="button" role="tab" data-route="6D" class="active" aria-selected="true">
+              6D
+            </button>
+            <button type="button" role="tab" data-route="2X" aria-selected="false">2X</button>
+          </div>
+        </div>
+        <div class="kmb-row">
+          <span class="kmb-route-label" id="kmb-dir-label">方向</span>
+          <div class="kmb-tabs" role="tablist" aria-label="行車方向">
+            <button type="button" role="tab" id="kmb-dir-o" data-dir="O" class="active" aria-selected="true">
+              往美孚
+            </button>
+            <button type="button" role="tab" id="kmb-dir-i" data-dir="I" aria-selected="false">
+              往牛頭角
+            </button>
+          </div>
         </div>
         <button type="button" class="kmb-refresh" id="kmb-refresh">立即更新</button>
       </div>
@@ -278,8 +309,14 @@
       });
 
       var KMB_BASE = "https://data.etabus.gov.hk/v1/transport/kmb";
+      /** 各路線 service_type 與方向按鈕顯示（與 KMB 路線表一致：O=往 dest_en） */
+      var ROUTE_META = {
+        "6D": { service: "1", destO: "美孚", destI: "牛頭角" },
+        "2X": { service: "1", destO: "美孚", destI: "彩福" },
+      };
       var stopsById = null;
       var routeStops = { O: [], I: [] };
+      var currentRoute = "6D";
       var currentDir = "O";
       var refreshTimer = null;
 
@@ -299,11 +336,12 @@
       }
 
       function loadRouteStops() {
+        var svc = ROUTE_META[currentRoute].service;
         return Promise.all([
-          fetch(KMB_BASE + "/route-stop/6D/outbound/1").then(function (r) {
+          fetch(KMB_BASE + "/route-stop/" + currentRoute + "/outbound/" + svc).then(function (r) {
             return r.json();
           }),
-          fetch(KMB_BASE + "/route-stop/6D/inbound/1").then(function (r) {
+          fetch(KMB_BASE + "/route-stop/" + currentRoute + "/inbound/" + svc).then(function (r) {
             return r.json();
           }),
         ]).then(function (pair) {
@@ -312,6 +350,22 @@
           }
           routeStops.O = pair[0].data.slice().sort(sortSeq);
           routeStops.I = pair[1].data.slice().sort(sortSeq);
+        });
+      }
+
+      function updateHeadingAndDirLabels() {
+        document.getElementById("kmb-heading").textContent =
+          "九巴 " + currentRoute + " 實時到站";
+        var meta = ROUTE_META[currentRoute];
+        document.getElementById("kmb-dir-o").textContent = "往" + meta.destO;
+        document.getElementById("kmb-dir-i").textContent = "往" + meta.destI;
+      }
+
+      function setRouteButtons() {
+        document.querySelectorAll("[data-route]").forEach(function (btn) {
+          var on = btn.getAttribute("data-route") === currentRoute;
+          btn.classList.toggle("active", on);
+          btn.setAttribute("aria-selected", on ? "true" : "false");
         });
       }
 
@@ -372,7 +426,8 @@
         var tbody = document.getElementById("kmb-tbody");
         statusEl.textContent = "更新中…";
 
-        return fetch(KMB_BASE + "/route-eta/6D/1")
+        var svc = ROUTE_META[currentRoute].service;
+        return fetch(KMB_BASE + "/route-eta/" + currentRoute + "/" + svc)
           .then(function (r) {
             if (!r.ok) throw new Error(r.statusText);
             return r.json();
@@ -432,6 +487,27 @@
             return loadRouteStops();
           })
           .then(function () {
+            updateHeadingAndDirLabels();
+            document.querySelectorAll("[data-route]").forEach(function (btn) {
+              btn.addEventListener("click", function () {
+                var next = btn.getAttribute("data-route");
+                if (next === currentRoute) return;
+                currentRoute = next;
+                setRouteButtons();
+                statusEl.textContent = "載入 " + currentRoute + " 站序…";
+                loadRouteStops()
+                  .then(function () {
+                    currentDir = "O";
+                    updateHeadingAndDirLabels();
+                    setDirButtons();
+                    return updateKmb();
+                  })
+                  .catch(function () {
+                    statusEl.textContent =
+                      "無法載入 " + currentRoute + " 路線站序，請重新整理或換線再試。";
+                  });
+              });
+            });
             document.querySelectorAll(".kmb-tabs [data-dir]").forEach(function (btn) {
               btn.addEventListener("click", function () {
                 currentDir = btn.getAttribute("data-dir");
@@ -442,6 +518,7 @@
             document.getElementById("kmb-refresh").addEventListener("click", function () {
               updateKmb();
             });
+            setRouteButtons();
             setDirButtons();
             return updateKmb();
           })
@@ -450,7 +527,7 @@
             refreshTimer = setInterval(updateKmb, 45000);
           })
           .catch(function () {
-            statusEl.textContent = "無法載入 6D 路線站序，請重新整理頁面。";
+            statusEl.textContent = "無法載入路線站序，請重新整理頁面。";
           });
       }
 
