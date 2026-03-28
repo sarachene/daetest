@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>淺藍背景</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      background: #add8e6;
+      font-family: system-ui, "Segoe UI", "Microsoft JhengHei", sans-serif;
+      color: #1e3a5f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 1.5rem 1rem 2.5rem;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 42rem;
+    }
+
+    .hero {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 4vw, 2.25rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .theme-btn {
+      margin-top: 1.25rem;
+      padding: 0.55rem 1.25rem;
+      font-size: 1rem;
+      font-family: inherit;
+      color: #1e3a5f;
+      background: #fff;
+      border: 1px solid rgba(30, 58, 95, 0.35);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .theme-btn:hover {
+      background: #f0f7fc;
+      border-color: rgba(30, 58, 95, 0.5);
+    }
+
+    body.is-dark .theme-btn {
+      color: #e8e8e8;
+      background: #2a2a2a;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    body.is-dark .theme-btn:hover {
+      background: #3a3a3a;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    body.is-dark {
+      background: #000;
+      color: #e8e8e8;
+    }
+
+    .kmb {
+      margin-top: 2rem;
+      text-align: left;
+    }
+
+    .kmb h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .kmb .kmb-note {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin-bottom: 0.75rem;
+      line-height: 1.45;
+    }
+
+    .kmb-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .kmb-tabs {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .kmb-tabs button {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid rgba(30, 58, 95, 0.35);
+      background: rgba(255, 255, 255, 0.75);
+      color: #1e3a5f;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .kmb-tabs button:hover {
+      background: #fff;
+    }
+
+    .kmb-tabs button.active {
+      background: #1e3a5f;
+      color: #fff;
+      border-color: #1e3a5f;
+    }
+
+    body.is-dark .kmb-tabs button {
+      background: #2a2a2a;
+      color: #e8e8e8;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    body.is-dark .kmb-tabs button:hover {
+      background: #3a3a3a;
+    }
+
+    body.is-dark .kmb-tabs button.active {
+      background: #e8e8e8;
+      color: #111;
+      border-color: #e8e8e8;
+    }
+
+    .kmb-refresh {
+      font-family: inherit;
+      font-size: 0.8rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid rgba(30, 58, 95, 0.35);
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .kmb-refresh:hover {
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    body.is-dark .kmb-refresh:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .kmb-status {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      min-height: 1.25em;
+      margin-bottom: 0.5rem;
+    }
+
+    .kmb-table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(30, 58, 95, 0.2);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    body.is-dark .kmb-table-wrap {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .kmb table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .kmb th,
+    .kmb td {
+      padding: 0.45rem 0.5rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid rgba(30, 58, 95, 0.12);
+    }
+
+    body.is-dark .kmb th,
+    body.is-dark .kmb td {
+      border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .kmb th {
+      font-weight: 600;
+      white-space: nowrap;
+      background: rgba(30, 58, 95, 0.08);
+    }
+
+    body.is-dark .kmb th {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .kmb td:first-child {
+      width: 2.25rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kmb td:nth-child(2) {
+      min-width: 7rem;
+    }
+
+    .kmb .eta-cell {
+      font-variant-numeric: tabular-nums;
+      line-height: 1.35;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <h1>歡迎</h1>
+      <button type="button" class="theme-btn" id="toBlackBg">改為黑色背景</button>
+    </header>
+
+    <section class="kmb" id="kmb-panel" aria-labelledby="kmb-heading">
+      <h2 id="kmb-heading">九巴 6D 實時到站</h2>
+      <p class="kmb-note">
+        資料來源：運輸署「九龍巴士及龍運巴士路線實時到站數據」（data.etabus.gov.hk）。ETA 約每分鐘更新；下列為各路線方向各站之預計到站時間。
+      </p>
+      <div class="kmb-toolbar">
+        <div class="kmb-tabs" role="tablist" aria-label="行車方向">
+          <button type="button" role="tab" data-dir="O" class="active" aria-selected="true">
+            往美孚
+          </button>
+          <button type="button" role="tab" data-dir="I" aria-selected="false">
+            往牛頭角
+          </button>
+        </div>
+        <button type="button" class="kmb-refresh" id="kmb-refresh">立即更新</button>
+      </div>
+      <p class="kmb-status" id="kmb-status" aria-live="polite">載入中…</p>
+      <div class="kmb-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">序</th>
+              <th scope="col">站名</th>
+              <th scope="col">班次 1</th>
+              <th scope="col">班次 2</th>
+              <th scope="col">班次 3</th>
+            </tr>
+          </thead>
+          <tbody id="kmb-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      document.getElementById("toBlackBg").addEventListener("click", function () {
+        document.body.classList.add("is-dark");
+      });
+
+      var KMB_BASE = "https://data.etabus.gov.hk/v1/transport/kmb";
+      var stopsById = null;
+      var routeStops = { O: [], I: [] };
+      var currentDir = "O";
+      var refreshTimer = null;
+
+      function ensureStopDirectory() {
+        if (stopsById) return Promise.resolve();
+        return fetch(KMB_BASE + "/stop/")
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.statusText);
+            return r.json();
+          })
+          .then(function (json) {
+            stopsById = new Map();
+            json.data.forEach(function (s) {
+              stopsById.set(s.stop, s);
+            });
+          });
+      }
+
+      function loadRouteStops() {
+        return Promise.all([
+          fetch(KMB_BASE + "/route-stop/6D/outbound/1").then(function (r) {
+            return r.json();
+          }),
+          fetch(KMB_BASE + "/route-stop/6D/inbound/1").then(function (r) {
+            return r.json();
+          }),
+        ]).then(function (pair) {
+          function sortSeq(a, b) {
+            return Number(a.seq) - Number(b.seq);
+          }
+          routeStops.O = pair[0].data.slice().sort(sortSeq);
+          routeStops.I = pair[1].data.slice().sort(sortSeq);
+        });
+      }
+
+      function stopName(id) {
+        var s = stopsById && stopsById.get(id);
+        if (!s) return id;
+        return s.name_tc || s.name_en || id;
+      }
+
+      function formatEta(iso) {
+        if (!iso) return "—";
+        var d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return "—";
+        var diffMin = Math.round((d.getTime() - Date.now()) / 60000);
+        if (diffMin < -1) return "已過站";
+        if (diffMin <= 0) return "即將到站";
+        var hm = d.toLocaleTimeString("zh-HK", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+        if (diffMin < 180) return diffMin + " 分鐘（" + hm + "）";
+        return hm;
+      }
+
+      function remarkLine(row) {
+        var r = row.rmk_tc || row.rmk_en;
+        if (!r) return "";
+        return "\n" + r;
+      }
+
+      function groupEtasBySeq(rows, dir) {
+        var map = new Map();
+        rows.forEach(function (row) {
+          if (row.dir !== dir) return;
+          var seq = Number(row.seq);
+          if (!map.has(seq)) map.set(seq, []);
+          map.get(seq).push(row);
+        });
+        map.forEach(function (arr) {
+          arr.sort(function (a, b) {
+            return a.eta_seq - b.eta_seq;
+          });
+        });
+        return map;
+      }
+
+      function setDirButtons() {
+        document.querySelectorAll(".kmb-tabs [data-dir]").forEach(function (btn) {
+          var on = btn.getAttribute("data-dir") === currentDir;
+          btn.classList.toggle("active", on);
+          btn.setAttribute("aria-selected", on ? "true" : "false");
+        });
+      }
+
+      function updateKmb() {
+        var statusEl = document.getElementById("kmb-status");
+        var tbody = document.getElementById("kmb-tbody");
+        statusEl.textContent = "更新中…";
+
+        return fetch(KMB_BASE + "/route-eta/6D/1")
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.statusText);
+            return r.json();
+          })
+          .then(function (json) {
+            var bySeq = groupEtasBySeq(json.data, currentDir);
+            var rows = routeStops[currentDir];
+            tbody.replaceChildren();
+
+            rows.forEach(function (rs) {
+              var seq = Number(rs.seq);
+              var tr = document.createElement("tr");
+              var etas = bySeq.get(seq) || [];
+
+              var tdSeq = document.createElement("td");
+              tdSeq.textContent = String(seq);
+              tr.appendChild(tdSeq);
+
+              var tdName = document.createElement("td");
+              tdName.textContent = stopName(rs.stop);
+              tr.appendChild(tdName);
+
+              for (var i = 0; i < 3; i++) {
+                var td = document.createElement("td");
+                td.className = "eta-cell";
+                if (etas[i]) {
+                  td.textContent = formatEta(etas[i].eta) + remarkLine(etas[i]);
+                } else {
+                  td.textContent = "—";
+                }
+                tr.appendChild(td);
+              }
+
+              tbody.appendChild(tr);
+            });
+
+            statusEl.textContent =
+              "最後更新：" +
+              new Date().toLocaleString("zh-HK", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+              });
+          })
+          .catch(function () {
+            statusEl.textContent = "無法載入到站資料，請檢查網絡或稍後再按「立即更新」。";
+          });
+      }
+
+      function initKmb() {
+        var statusEl = document.getElementById("kmb-status");
+        statusEl.textContent = "載入站點資料…";
+
+        ensureStopDirectory()
+          .then(function () {
+            return loadRouteStops();
+          })
+          .then(function () {
+            document.querySelectorAll(".kmb-tabs [data-dir]").forEach(function (btn) {
+              btn.addEventListener("click", function () {
+                currentDir = btn.getAttribute("data-dir");
+                setDirButtons();
+                updateKmb();
+              });
+            });
+            document.getElementById("kmb-refresh").addEventListener("click", function () {
+              updateKmb();
+            });
+            setDirButtons();
+            return updateKmb();
+          })
+          .then(function () {
+            if (refreshTimer) clearInterval(refreshTimer);
+            refreshTimer = setInterval(updateKmb, 45000);
+          })
+          .catch(function () {
+            statusEl.textContent = "無法載入 6D 路線站序，請重新整理頁面。";
+          });
+      }
+
+      initKmb();
+    })();
+  </script>
+</body>
+</html>
